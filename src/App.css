@@ -5,4 +5,19 @@ body {
 .app {
 	background-color: #202020;
 	min-height: 100vh;
+	display: flex;
+	align-items: center;
+}
+.canvas-wrapper {
+	/*box-shadow: 0 0 50px white;*/
+	margin: auto;
+	position: relative;
+}
+#canvas-fg {
+	position: absolute;
+	z-index: 2;
+}
+#canvas-bg {
+	position: absolute;
+	z-index: 1;
 }
