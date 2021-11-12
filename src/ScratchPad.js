@@ -41,6 +41,7 @@ const ScratchPad = (props) => {
 
 		const drawImg = (ctx, srcImg) => {
 			const img = new Image();
+			img.crossOrigin = "anonymous";
 			img.src = srcImg;
 			img.onload = () => {
 				ctx.drawImage(img, 0, 0, width, height);
@@ -61,6 +62,17 @@ const ScratchPad = (props) => {
 			brushImg.onload = () => {
 				ctx.drawImage(brushImg, x, y, sizeBrush, sizeBrush);
 			}
+		}
+
+		const saveImg = () => {
+			const image = canvasFg.toDataURL();
+			var tmpLink = document.createElement('a');  
+			tmpLink.download = 'image.png';
+			tmpLink.href = image;  
+		
+			document.body.appendChild(tmpLink);
+			tmpLink.click();  
+			document.body.removeChild(tmpLink);
 		}
 
 		const canvasFg = canvasFgRef.current;
@@ -98,10 +110,13 @@ const ScratchPad = (props) => {
 			indexBg++;
 			if (indexBg >= imgs.length)
 			{
+				ctxFg.globalCompositeOperation = "destination-over";
+				ctxFg.drawImage(canvasBg, 0, 0);
 				isRunning = false;
 				clearInterval(switchInterval);
 				document.getElementsByClassName("canvas-wrapper")[0].classList.remove("hide-cursor");
 				setShowAnnounce(true);
+				saveImg();
 				setTimeout(() => setShowAnnounce(false), 3000);
 				return ;
 			}

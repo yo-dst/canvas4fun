@@ -4,7 +4,6 @@ import './App.css';
 import ScratchPad from "./ScratchPad";
 
 /*
-import brushImg from "./images/brush.png";
 import img1 from ;
 import img2 from ;
 import img3 from ;
@@ -22,7 +21,7 @@ const App = () => {
 					width={1200}
 					height={700}
 					sizeBrush={35}
-					switchFreq={7}
+					switchFreq={1}
 				/>
 				:
 				<button className="run-btn" onClick={e => setIsRunning(true)}>RUN</button>
