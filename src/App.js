@@ -22,6 +22,14 @@ const imgs = [
 	"https://picsum.photos/id/500/1200/700"
 ]
 
+function distanceBetween(point1, point2) {
+	return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
+}
+
+function angleBetween(point1, point2) {
+	return Math.atan2(point2.x - point1.x, point2.y - point1.y);
+}
+
 const App = () => {
 	let indexBg = 1;
 	const switchFreq = 10000;
@@ -32,14 +40,15 @@ const App = () => {
 	const canvasBgRef = useRef(null);
 	let isDrawing = false;
 	let isRunning = true;
+	let lastPoint;
+
 	//const brush = new Image();
 	//brush.src = brushImg;
 
 	const scratch = (ctx, x, y) => {
-		console.log(x + ", " + y);
-		if (!isDrawing || !isRunning)
+		//console.log(x + ", " + y);
+		if (!isRunning)
 			return (null);
-		ctx.fillStyle = "white";
 		ctx.globalCompositeOperation = "destination-out";
 		ctx.beginPath();
 		ctx.arc(x, y, sizeBrush, 0, 2 * Math.PI);
@@ -67,7 +76,19 @@ const App = () => {
 		canvasFg.addEventListener("mousedown", () => { isDrawing = true });
 		canvasFg.addEventListener("mouseup", () => { isDrawing = false });
 		canvasFg.addEventListener("mousemove", e => {
-			scratch(ctxFg, e.offsetX, e.offsetY);
+			if (!lastPoint)
+				lastPoint = { x: e.offsetX, y: e.offsetY };
+			const currentPoint = { x: e.offsetX, y: e.offsetY };
+
+			const dist = distanceBetween(lastPoint, currentPoint);
+			const angle = angleBetween(lastPoint, currentPoint);
+
+			for (let i = 0; i < dist; i++) {
+				let x = lastPoint.x + Math.sin(angle) * i - 25;
+				let y = lastPoint.y + Math.cos(angle) * i - 25;
+				scratch(ctxFg, x, y);
+			}
+			lastPoint = currentPoint;
 		});
 
 		drawImg(ctxFg, imgs[0]);
