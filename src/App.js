@@ -22,7 +22,7 @@ const App = () => {
 					width={1200}
 					height={700}
 					sizeBrush={35}
-					switchFreq={1}
+					switchFreq={7}
 				/>
 				:
 				<button className="run-btn" onClick={e => setIsRunning(true)}>RUN</button>
