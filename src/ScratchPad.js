@@ -25,23 +25,24 @@ const ScratchPad = (props) => {
 		height,
 		sizeBrush,
 		switchFreq
-
 	} = props;
 
-	const [showAnnounce, setShowAnnounce] = useState(false);
+	const [timer, setTimer] = useState(switchFreq);
+
+	const brushImg = new Image();
+	brushImg.src = brush;
 
 	const canvasFgRef = useRef(null);
 	const canvasBgRef = useRef(null);
 
 	useEffect(() => {
-		let indexBg = 1;
+		let indexFg = 0;
 		let isRunning = true;
-		//let isDrawing = false;
 		let lastPoint;
 
 		const drawImg = (ctx, srcImg) => {
 			const img = new Image();
-			img.crossOrigin = "anonymous";
+			img.crossOrigin = "anonymous"; // no need that if images are local
 			img.src = srcImg;
 			img.onload = () => {
 				ctx.drawImage(img, 0, 0, width, height);
@@ -50,21 +51,13 @@ const ScratchPad = (props) => {
 
 		const scratch = (ctx, x, y) => {
 			ctx.globalCompositeOperation = "destination-out";
-	
-			/* To use a circle instead of an image for the brush
-			ctx.beginPath();
-			ctx.arc(x, y, sizeBrush, 0, 2 * Math.PI);
-			ctx.fill();
-			*/
-	
-			const brushImg = new Image();
-			brushImg.src = brush;
-			brushImg.onload = () => {
-				ctx.drawImage(brushImg, x, y, sizeBrush, sizeBrush);
-			}
+			ctx.drawImage(brushImg, x, y, sizeBrush, sizeBrush);
 		}
 
 		const saveImg = () => {
+			ctxFg.globalCompositeOperation = "destination-over";
+			ctxFg.drawImage(canvasBg, 0, 0);
+
 			const image = canvasFg.toDataURL();
 			var tmpLink = document.createElement('a');  
 			tmpLink.download = 'image.png';
@@ -81,17 +74,17 @@ const ScratchPad = (props) => {
 		const canvasBg = canvasBgRef.current;
 		const ctxBg = canvasBg.getContext("2d");
 
-		// to add mouse click event
-		//document.addEventListener("mousedown", () => { isDrawing = true });
-		//document.addEventListener("mouseup", () => { isDrawing = false });
+		drawImg(ctxFg, imgs[0]);
+		drawImg(ctxBg, imgs[1]);
+
 		canvasFg.addEventListener("mousemove", e => {
-			if (!isRunning) // add '|| !isDrawing' to the condition to draw when mouse button pressed
+			if (!isRunning)
 				return (null);
 
 			if (!lastPoint)
 				lastPoint = { x: e.offsetX, y: e.offsetY };
-			const currentPoint = { x: e.offsetX, y: e.offsetY };
 
+			const currentPoint = { x: e.offsetX, y: e.offsetY };
 			const dist = distanceBetween(lastPoint, currentPoint);
 			const angle = angleBetween(lastPoint, currentPoint);
 
@@ -103,10 +96,29 @@ const ScratchPad = (props) => {
 			lastPoint = currentPoint;
 		});
 
-		drawImg(ctxFg, imgs[0]);
-		drawImg(ctxBg, imgs[1]);
-
-		const switchInterval = setInterval(() => {
+		const intervalId = setInterval(() => {
+			console.log(indexFg);
+			setTimer(timer => {
+				//console.log("here");
+				if (timer === 1)
+				{
+					//saveImg();
+					indexFg += 1;
+					if (indexFg >= imgs.length - 1) {
+						//console.log("here");
+						isRunning = false;
+						document.getElementsByClassName("canvas-wrapper")[0].classList.remove("hide-cursor");
+						return (null);
+					}
+					//console.log(indexFg);
+					drawImg(ctxBg, imgs[indexFg + 1]);
+					drawImg(ctxFg, imgs[indexFg]);
+					return (switchFreq);
+				}
+				else
+					return (timer - 1);
+			});
+			/*
 			indexBg++;
 			if (indexBg >= imgs.length)
 			{
@@ -114,7 +126,7 @@ const ScratchPad = (props) => {
 				ctxFg.drawImage(canvasBg, 0, 0);
 				isRunning = false;
 				clearInterval(switchInterval);
-				document.getElementsByClassName("canvas-wrapper")[0].classList.remove("hide-cursor");
+				
 				setShowAnnounce(true);
 				saveImg();
 				setTimeout(() => setShowAnnounce(false), 3000);
@@ -124,14 +136,16 @@ const ScratchPad = (props) => {
 			ctxFg.globalCompositeOperation = "destination-over";
 			ctxFg.drawImage(canvasBg, 0, 0);
 			drawImg(ctxBg, imgs[indexBg]);
-		}, switchFreq * 1000);
+			*/
+		}, 1000);
+		return () => clearInterval(intervalId);
 	}, [switchFreq, sizeBrush, width, height]);
 
 	return (
 		<div className="canvas-wrapper hide-cursor" style={{width: width, height: height}}>
 			<canvas ref={canvasFgRef} width={width} height={height} id="canvas-fg" />
 			<canvas ref={canvasBgRef} width={width} height={height} id="canvas-bg" />
-			{showAnnounce ? <div className="announce">Time is up !</div> : null}
+			<div className="timer">{timer}</div>
 		</div>
 	);
 }

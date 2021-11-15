@@ -1,6 +1,6 @@
 body {
 	margin: 0;
-	font-size: 16px;	
+	font-size: 16px;
 }
 .app {
 	background-color: #202020;
@@ -13,7 +13,6 @@ body {
 	cursor: none;
 }
 .canvas-wrapper {
-	/*box-shadow: 0 0 50px white;*/
 	position: relative;
 	display: flex;
 	justify-content: center;
@@ -27,51 +26,11 @@ body {
 	position: absolute;
 	z-index: 1;
 }
-.run-btn {
-	padding: 1.5rem 4rem;
-	background-color: white;
-	color: #202020;
-	border: none;
-	transition: transform 0.5s;
-	font-size: 3rem;
-	border-radius: 10px;
-	font-weight: bold;
-	box-shadow: 0 0 5px white;
-	cursor: pointer;
-}
-.run-btn:hover {
-	transform: scale(1.1);
-}
-.announce {
-	padding: 1rem 2rem;
-	background-color: #202020;
-	color: white;
-	font-weight: bold;
-	font-size: 3rem;
+.timer {
 	z-index: 3;
-	border-radius: 10px;
-}
-.save-btn, .reset-btn {
-	z-index: 3;
-	background-color: rgba(20, 20, 20, 0.5);
-	color: white;
 	position: absolute;
-	border: none;
-	padding: 1rem 3rem;
+	top: 1rem;
+	right: 1.2rem;
 	font-size: 1.5rem;
-	cursor: pointer;
-	font-weight: bold;
-}
-.save-btn {
-	top: 0;
-	left: 0;
-	border-radius: 0 0 4px 0;
-}
-.reset-btn {
-	top: 0;
-	right: 0;
-	border-radius: 0 0 0 4px;
-}
-.save-btn:hover, .reset-btn:hover {
-	background-color: rgba(20, 20, 20, 0.7);
+	color: white;
 }
