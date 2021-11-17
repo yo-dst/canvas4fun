@@ -26,11 +26,18 @@ body {
 	position: absolute;
 	z-index: 1;
 }
+@keyframes fadeOut {
+	0% {opacity: 100;}
+	80% {opacity: 100;}
+	90% {opacity: 0;}
+	100% {opacity: 0;}
+}
 .timer {
 	z-index: 3;
 	position: absolute;
 	top: 1rem;
 	right: 1.2rem;
-	font-size: 1.5rem;
+	font-size: 2rem;
 	color: white;
+	animation: fadeOut 1s infinite;
 }

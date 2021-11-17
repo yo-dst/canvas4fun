@@ -1,17 +1,20 @@
-import { useEffect, useRef } from "react";
-import { useState } from "react/cjs/react.development";
+import { useEffect, useRef, useState } from "react";
 
 import "./App.css";
-import brush from "./images/brush0.png";
 
 const ScratchPad = (props) => {
 	const {
+		switchFreq,
 		width,
 		height,
 		sizeBrush,
-		fg,
-		bg
+		index,
+		imgs,
+		brush,
+		save
 	} = props;
+
+	const [timer, setTimer] = useState(switchFreq);
 
 	const brushImg = new Image();
 	brushImg.src = brush;
@@ -28,17 +31,12 @@ const ScratchPad = (props) => {
 	}
 
 	const drawImg = (ctx, srcImg) => {
-		const img = new Image();
-		img.crossOrigin = "anonymous"; // no need that if images are local
+		let img = new Image();
 		img.src = srcImg;
 		img.onload = () => {
+			ctx.globalCompositeOperation = "source-over";
 			ctx.drawImage(img, 0, 0, width, height);
-		};
-	}
-
-	const scratch = (ctx, x, y) => {
-		ctx.globalCompositeOperation = "destination-out";
-		ctx.drawImage(brushImg, x, y, sizeBrush, sizeBrush);
+		}
 	}
 
 	const saveImg = (canvas) => {
@@ -53,7 +51,6 @@ const ScratchPad = (props) => {
 	}
 
 	useEffect(() => {
-		console.log("rerender pad");
 		let lastPoint;
 
 		const canvasFg = canvasFgRef.current;
@@ -62,8 +59,8 @@ const ScratchPad = (props) => {
 		const canvasBg = canvasBgRef.current;
 		const ctxBg = canvasBg.getContext("2d");
 
-		drawImg(ctxFg, fg);
-		drawImg(ctxBg, bg);
+		drawImg(ctxFg, imgs[index]);
+		drawImg(ctxBg, imgs[index + 1]);
 
 		canvasFg.addEventListener("mousemove", e => {
 			if (!lastPoint)
@@ -73,20 +70,37 @@ const ScratchPad = (props) => {
 			const dist = distanceBetween(lastPoint, currentPoint);
 			const angle = angleBetween(lastPoint, currentPoint);
 
+			ctxFg.globalCompositeOperation = "destination-out";
 			for (let i = 0; i < dist; i++) {
 				let x = lastPoint.x + Math.sin(angle) * i - 25;
 				let y = lastPoint.y + Math.cos(angle) * i - 25;
-				scratch(ctxFg, x, y);
+				if (brushImg.complete && brushImg.naturalHeight !== 0)
+					ctxFg.drawImage(brushImg, x, y, sizeBrush, sizeBrush);
 			}
 			lastPoint = currentPoint;
 		});
-	}, [sizeBrush, width, height, fg, bg]);
+
+		const timerInterval = setInterval(() => {
+			setTimer(timer => timer === 0 ? 0 : timer - 1);
+		}, 1000);
+
+		return () => {
+			if (save)
+			{
+				ctxFg.globalCompositeOperation = "destination-over";
+				ctxFg.drawImage(canvasBg, 0, 0);
+				saveImg(canvasFg);
+			}
+			setTimer(switchFreq);
+			clearInterval(timerInterval);
+		}
+	}, [index]);
 
 	return (
 		<div className="canvas-wrapper hide-cursor" style={{width: width, height: height}}>
 			<canvas ref={canvasFgRef} width={width} height={height} id="canvas-fg" />
 			<canvas ref={canvasBgRef} width={width} height={height} id="canvas-bg" />
-			
+			<div className="timer">{timer}</div>
 		</div>
 	);
 }

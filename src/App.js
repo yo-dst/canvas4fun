@@ -1,75 +1,62 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import './App.css';
 import ScratchPad from "./ScratchPad";
 
+import brush from "./images/brush0.png";
+import img1 from "./images/1.png";
+import img2 from "./images/2.png";
+import img3 from "./images/3.png";
+import img4 from "./images/4.png";
+import img5 from "./images/5.png";
+import img6 from "./images/6.png";
+import img7 from "./images/7.png";
+import img8 from "./images/8.png";
+
 const imgs = [
-	"https://picsum.photos/id/10/1200/700",
-	"https://picsum.photos/id/40/1200/700",
-	"https://picsum.photos/id/100/1200/700",
-	"https://picsum.photos/id/200/1200/700",
-	"https://picsum.photos/id/500/1200/700"
-]
-
-const Child = (props) => {
-	const canvasRef = useRef(null);
-
-	useEffect(() => {
-		const canvas = canvasRef.current;
-		const ctx = canvas.getContext("2d");
-
-		const img = new Image();
-		img.src = imgs[props.index];
-		img.onload = () => {
-			ctx.drawImage(img, 0, 0, props.width, props.height);
-		}
-	}, [props.index]);
-
-	return (
-		<div style={{color: "white"}}>
-			<canvas ref={canvasRef} width={props.width} height={props.height} />
-		</div>
-	)
-}
+	img1,
+	img2,
+	img3,
+	img4,
+	img5,
+	img6,
+	img7,
+	img8
+];
 
 const App = () => {
-	const [counter, setCounter] = useState(0);
-
-  	return (
-		<div className="app">
-			<button onClick={e => setCounter(counter + 1)}>Increment</button>
-			<Child width={500} height={500} index={counter} />
-		</div>
-  	);
-}
-
-const App2 = () => {
+	const switchFreq = 5; // in s
 	const [index, setIndex] = useState(0);
-	const switchFreq = 5000; // in ms
 
 	useEffect(() => {
-		const interval = setInterval(() => {
+		const switchInterval = setInterval(() => {
 			setIndex(index => {
-				console.log(index);
 				if (index === imgs.length - 1)
 				{
-					clearInterval(interval);
+					clearInterval(switchInterval);
 					return (index);
 				}
 				return (index + 1);
 			});
-		}, switchFreq);
+		}, switchFreq * 1000);
 	}, []);
 
   	return (
 		<div className="app">
-			<ScratchPad
-				width={1200}
-				height={700}
-				sizeBrush={35}
-				fg={imgs[index]}
-				bg={imgs[index + 1]}
-			/>
+			{index === imgs.length - 1 ?
+				<div style={{color: "white", fontSize: "2.5rem"}}>Terminado terminada</div>
+				:
+				<ScratchPad
+					width={1200}
+					height={700}
+					sizeBrush={35}
+					index={index}
+					imgs={imgs}
+					save={false}
+					brush={brush}
+					switchFreq={switchFreq}
+				/>
+			}	
 		</div>
   	);
 }
