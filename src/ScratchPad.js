@@ -16,9 +16,6 @@ const ScratchPad = (props) => {
 
 	const [timer, setTimer] = useState(switchFreq);
 
-	const brushImg = new Image();
-	brushImg.src = brush;
-
 	const canvasFgRef = useRef(null);
 	const canvasBgRef = useRef(null);
 
@@ -30,27 +27,30 @@ const ScratchPad = (props) => {
 		return Math.atan2(point2.x - point1.x, point2.y - point1.y);
 	}
 
-	const drawImg = (ctx, srcImg) => {
-		let img = new Image();
-		img.src = srcImg;
-		img.onload = () => {
-			ctx.globalCompositeOperation = "source-over";
-			ctx.drawImage(img, 0, 0, width, height);
-		}
-	}
-
-	const saveImg = (canvas) => {
-		const image = canvas.toDataURL();
-		var tmpLink = document.createElement('a');  
-		tmpLink.download = 'image.png';
-		tmpLink.href = image;  
-	
-		document.body.appendChild(tmpLink);
-		tmpLink.click();  
-		document.body.removeChild(tmpLink);
-	}
-
 	useEffect(() => {
+		const drawImg = (ctx, srcImg) => {
+			let img = new Image();
+			img.src = srcImg;
+			img.onload = () => {
+				ctx.globalCompositeOperation = "source-over";
+				ctx.drawImage(img, 0, 0, width, height);
+			}
+		}
+
+		const saveImg = (canvas) => {
+			const image = canvas.toDataURL();
+			var tmpLink = document.createElement('a');  
+			tmpLink.download = 'image.png';
+			tmpLink.href = image;  
+		
+			document.body.appendChild(tmpLink);
+			tmpLink.click();  
+			document.body.removeChild(tmpLink);
+		}
+
+		const brushImg = new Image();
+		brushImg.src = brush;
+
 		let lastPoint;
 
 		const canvasFg = canvasFgRef.current;
@@ -94,7 +94,7 @@ const ScratchPad = (props) => {
 			setTimer(switchFreq);
 			clearInterval(timerInterval);
 		}
-	}, [index]);
+	}, [index, imgs, switchFreq, save, sizeBrush, height, width, brush]);
 
 	return (
 		<div className="canvas-wrapper hide-cursor" style={{width: width, height: height}}>
