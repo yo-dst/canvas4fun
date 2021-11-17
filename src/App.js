@@ -25,7 +25,7 @@ const imgs = [
 ];
 
 const App = () => {
-	const switchFreq = 5; // in s
+	const switchFreq = 7; // in s
 	const [index, setIndex] = useState(0);
 
 	useEffect(() => {
@@ -49,7 +49,7 @@ const App = () => {
 				<ScratchPad
 					width={1200}
 					height={700}
-					sizeBrush={35}
+					sizeBrush={40}
 					index={index}
 					imgs={imgs}
 					save={false}
